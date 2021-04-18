@@ -24,4 +24,4 @@ allParticles :: World -> [Particle]
 allParticles = _allParticles
 
 nearbyParticles :: Particle -> World -> [Particle]
-nearbyParticles _ world = _allParticles world
+nearbyParticles _ world = if null (_allParticles world) then [] else [head $ _allParticles world]
