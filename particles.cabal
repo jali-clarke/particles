@@ -61,6 +61,7 @@ test-suite particles-test
     main-is:          Spec.hs
     other-modules:
         TestIdCtx
+        TestParticle
         TestWorld
     build-depends:
         particles,
