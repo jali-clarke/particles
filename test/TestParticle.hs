@@ -9,7 +9,7 @@ import Particle (newSpecies, newParticle)
 
 testParticle :: Spec
 testParticle = describe "Particle" $ do
-    describe "#(==) @Species" $ do
+    describe "(==) @Species" $ do
         it "should consider species with the same id to be equal" $
             let species = runIdCtx (newSpecies 5 5 5)
             in species `shouldBe` species
@@ -17,7 +17,7 @@ testParticle = describe "Particle" $ do
             species0 <- newSpecies 5 5 5
             species1 <- newSpecies 5 5 5
             pure $ species0 `shouldNotBe` species1
-    describe "#(==) @Particle" $ do
+    describe "(==) @Particle" $ do
         it "should consider particles with the same id to be equal" $
             let species = runIdCtx (newSpecies 5 5 5)
                 particle = runIdCtx (newParticle species 5 5 5)
