@@ -1,3 +1,7 @@
+{-# LANGUAGE
+    GeneralizedNewtypeDeriving
+#-}
+
 module IdCtx (
     IdCtx,
 
@@ -5,10 +9,12 @@ module IdCtx (
     getNextId
 ) where
 
-data IdCtx a = IdCtx a
+import Control.Monad.State (State, evalState, state)
+
+newtype IdCtx a = IdCtx (State Int a) deriving (Functor, Applicative, Monad)
 
 runIdCtx :: IdCtx a -> a
-runIdCtx (IdCtx thing) = thing
+runIdCtx (IdCtx stateAction) = evalState stateAction 0
 
 getNextId :: IdCtx Int
-getNextId = IdCtx 0
+getNextId = IdCtx (state (\nextId -> (nextId, nextId + 1)))
