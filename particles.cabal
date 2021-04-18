@@ -47,9 +47,7 @@ executable particles
     -- other-extensions:
     build-depends:
         particles,
-
         base ^>=4.14.1.0
-
     hs-source-dirs:   app
     default-language: Haskell2010
     ghc-options: -Wall -Werror -Wextra -O2
@@ -68,5 +66,15 @@ test-suite particles-test
 
         base ^>=4.14.1.0,
         hspec == 2.7.10
-
     ghc-options: -Wall -Werror -Wextra
+
+benchmark bench
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   bench
+    main-is:          Bench.hs
+    build-depends:
+        particles,
+
+        base ^>=4.14.1.0,
+        criterion == 1.5.9.0
+    ghc-options: -Wall -Werror -Wextra -O2
