@@ -2,15 +2,19 @@ module World (
     World,
 
     newWorld,
-    getNearbyParticles
+    allParticles,
+    addParticle
 ) where
 
 import Particle (Particle)
 
-data World = World {_xMax :: Double, _yMax :: Double, _zMax :: Double}
+data World = World {_xMax :: Double, _yMax :: Double, _zMax :: Double, _allParticles :: [Particle]}
 
 newWorld :: Double -> Double -> Double -> World
-newWorld = World
+newWorld xMax yMax zMax = World xMax yMax zMax []
 
-getNearbyParticles :: World -> Particle -> [Particle]
-getNearbyParticles _ _ = []
+allParticles :: World -> [Particle]
+allParticles = _allParticles
+
+addParticle :: Particle -> World -> World
+addParticle particle world = world {_allParticles = [particle]}
