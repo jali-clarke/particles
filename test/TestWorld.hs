@@ -9,7 +9,7 @@ import Data.List (sortOn)
 
 import IdCtx (runIdCtx)
 import Particle (newSpecies, newParticle, particleId)
-import World (newWorld, addParticle, allParticles)
+import World (newWorld, addParticle, allParticles, nearbyParticles)
 
 testWorld :: Spec
 testWorld = describe "World" $ do
@@ -25,3 +25,9 @@ testWorld = describe "World" $ do
                 particles = runIdCtx (replicateM 5 $ newParticle species 5 5 5)
                 world = foldr addParticle (newWorld 10 10 10) particles
             in sortOn particleId (allParticles world) `shouldBe` particles
+    describe "#nearbyParticles" $ do
+        it "should return empty list of particles if empty world" $
+            let species = runIdCtx (newSpecies 0.1 0.1 0.2)
+                particle = runIdCtx (newParticle species 5 5 5)
+                world = newWorld 10 10 10
+            in nearbyParticles particle world `shouldBe` []
