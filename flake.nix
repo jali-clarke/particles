@@ -13,6 +13,9 @@
       {
         devShell = pkgs.mkShell {
           buildInputs = [
+            pkgs.cabal-install
+            pkgs.cabal2nix
+            pkgs.ghc
             pkgs.nixpkgs-fmt
           ];
         };
