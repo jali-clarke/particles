@@ -16,8 +16,8 @@ data World = World {_xMax :: Double, _yMax :: Double, _zMax :: Double, _allParti
 newWorld :: Double -> Double -> Double -> World
 newWorld xMax yMax zMax = World xMax yMax zMax []
 
-stepWorld :: Double -> World -> World
-stepWorld _ world = world
+stepWorld :: Double -> World -> World -> World
+stepWorld _ _ world = world
 
 addParticle :: Particle -> World -> World
 addParticle particle world =
