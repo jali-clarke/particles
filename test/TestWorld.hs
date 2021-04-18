@@ -31,3 +31,8 @@ testWorld = describe "World" $ do
                 particle = runIdCtx (newParticle species 5 5 5)
                 world = newWorld 10 10 10
             in nearbyParticles particle world `shouldBe` []
+        it "should return singleton list of particles if sole particle is nearby" $
+            let species = runIdCtx (newSpecies 0.1 0.1 5)
+                (particle0, particle1) = runIdCtx ((,) <$> newParticle species 5 5 5 <*> newParticle species 6 6 6)
+                world = addParticle particle1 (newWorld 10 10 10)
+            in nearbyParticles particle0 world `shouldBe` [particle1]

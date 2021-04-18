@@ -24,4 +24,4 @@ allParticles :: World -> [Particle]
 allParticles = _allParticles
 
 nearbyParticles :: Particle -> World -> [Particle]
-nearbyParticles _ _ = []
+nearbyParticles _ world = _allParticles world
