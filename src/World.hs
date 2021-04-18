@@ -17,7 +17,7 @@ newWorld :: Double -> Double -> Double -> World
 newWorld xMax yMax zMax = World xMax yMax zMax []
 
 stepWorld :: World -> World
-stepWorld world = world {_allParticles = []}
+stepWorld world = world
 
 addParticle :: Particle -> World -> World
 addParticle particle world =

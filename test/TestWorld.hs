@@ -8,8 +8,13 @@ import Control.Monad (replicateM)
 import Data.List (sortOn)
 
 import IdCtx (runIdCtx)
-import Particle (newSpecies, newParticle, particleId)
+import Particle (Particle, newSpecies, newParticle, particleId, x, y, z)
 import World (newWorld, stepWorld, addParticle, allParticles, nearbyParticles)
+
+coordinatesEqual :: Particle -> Particle -> Bool
+coordinatesEqual particle0 particle1 =
+    let coordinateEqual coord = coord particle0 == coord particle1
+    in coordinateEqual x && coordinateEqual y && coordinateEqual z
 
 testWorld :: Spec
 testWorld = describe "World" $ do
@@ -54,7 +59,20 @@ testWorld = describe "World" $ do
             let world = foldr addParticle (newWorld 10 10 10) [particle1, particle2, particle3, particle4]
             pure $ sortOn particleId (nearbyParticles particle0 world) `shouldBe` [particle1, particle3]
     describe "stepWorld" $ do
-        it "should do nothing there are no particles" $
+        it "should do nothing if there are no particles" $
             let world = newWorld 10 10 10
                 nextWorld = stepWorld world
             in allParticles nextWorld `shouldBe` []
+        it "should do nothing if all of the particles are too far away from each other" $ runIdCtx $ do
+            let (smallSpecies, largeSpecies) = runIdCtx $ (,) <$> newSpecies 0.001 0.1 1 <*> newSpecies 0.001 0.5 4
+            top <- newParticle largeSpecies 0 10 0
+            bottom <- newParticle largeSpecies 0 (-10) 0
+            left <- newParticle smallSpecies (-10) 0 0
+            right <- newParticle smallSpecies 10 0 0
+            let particles = [top, bottom, left, right]
+                world = foldr addParticle (newWorld 20 20 20) particles
+                nextWorld = stepWorld world
+                allNextParticles = sortOn particleId (allParticles nextWorld)
+            pure $ do
+                allNextParticles `shouldBe` particles
+                foldr (&&) True (zipWith coordinatesEqual allNextParticles particles) `shouldBe` True
