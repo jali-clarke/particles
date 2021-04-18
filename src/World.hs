@@ -17,4 +17,6 @@ allParticles :: World -> [Particle]
 allParticles = _allParticles
 
 addParticle :: Particle -> World -> World
-addParticle particle world = world {_allParticles = [particle]}
+addParticle particle world =
+    let updatedSet = particle : _allParticles world
+    in world {_allParticles = updatedSet}

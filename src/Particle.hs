@@ -3,7 +3,9 @@ module Particle (
     Particle,
 
     newSpecies,
-    newParticle
+    newParticle,
+
+    particleId
 ) where
 
 import IdCtx (IdCtx, getNextId)
@@ -22,3 +24,6 @@ newSpecies mass radius neighbourhoodRadius = fmap (\nextId -> Species nextId mas
 
 newParticle :: Species -> Double -> Double -> Double -> IdCtx Particle
 newParticle species x y z = fmap (\nextId -> Particle nextId species x y z) getNextId
+
+particleId :: Particle -> Int
+particleId = _particleId
