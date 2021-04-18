@@ -30,6 +30,7 @@ library
     build-depends:    base ^>=4.14.1.0
     hs-source-dirs:   src
     default-language: Haskell2010
+    ghc-options: -Wall -Werror -Wextra
 
 executable particles
     main-is:          Main.hs
@@ -45,10 +46,17 @@ executable particles
 
     hs-source-dirs:   app
     default-language: Haskell2010
+    ghc-options: -Wall -Werror -Wextra -O2
 
 test-suite particles-test
     default-language: Haskell2010
     type:             exitcode-stdio-1.0
     hs-source-dirs:   test
-    main-is:          MyLibTest.hs
-    build-depends:    base ^>=4.14.1.0
+    main-is:          Spec.hs
+    other-modules:
+        TestWorld
+    build-depends:
+        base ^>=4.14.1.0,
+        hspec == 2.7.10
+
+    ghc-options: -Wall -Werror -Wextra
