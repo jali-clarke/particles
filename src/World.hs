@@ -8,7 +8,7 @@ module World (
     nearbyParticles
 ) where
 
-import Particle (Particle)
+import Particle (Particle, neighbourhoodRadius, species, x, y, z)
 
 data World = World {_xMax :: Double, _yMax :: Double, _zMax :: Double, _allParticles :: [Particle]}
 
@@ -24,4 +24,10 @@ allParticles :: World -> [Particle]
 allParticles = _allParticles
 
 nearbyParticles :: Particle -> World -> [Particle]
-nearbyParticles _ world = if null (_allParticles world) then [] else [head $ _allParticles world]
+nearbyParticles particle world =
+    let particleIsNearby otherParticle =
+            let square = (^ (2 :: Int))
+                squaredDiffCoord coord = square (coord particle - coord otherParticle)
+                squaredDist = squaredDiffCoord x + squaredDiffCoord y + squaredDiffCoord z
+            in squaredDist <= square (neighbourhoodRadius . species $ particle)
+    in filter particleIsNearby (_allParticles world)

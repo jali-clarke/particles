@@ -5,7 +5,12 @@ module Particle (
     newSpecies,
     newParticle,
 
-    particleId
+    particleId,
+    x,
+    y,
+    z,
+    species,
+    neighbourhoodRadius
 ) where
 
 import IdCtx (IdCtx, getNextId)
@@ -20,10 +25,25 @@ instance Eq Particle where
     particle0 == particle1 = _particleId particle0 == _particleId particle1
 
 newSpecies :: Double -> Double -> Double -> IdCtx Species
-newSpecies mass radius neighbourhoodRadius = fmap (\nextId -> Species nextId mass radius neighbourhoodRadius) getNextId
+newSpecies mass radius thisNeighbourhoodRadius = fmap (\nextId -> Species nextId mass radius thisNeighbourhoodRadius) getNextId
 
 newParticle :: Species -> Double -> Double -> Double -> IdCtx Particle
-newParticle species x y z = fmap (\nextId -> Particle nextId species x y z) getNextId
+newParticle thisSpecies thisX thisY thisZ = fmap (\nextId -> Particle nextId thisSpecies thisX thisY thisZ) getNextId
 
 particleId :: Particle -> Int
 particleId = _particleId
+
+x :: Particle -> Double
+x = _x
+
+y :: Particle -> Double
+y = _y
+
+z :: Particle -> Double
+z = _z
+
+species :: Particle -> Species
+species = _species
+
+neighbourhoodRadius :: Species -> Double
+neighbourhoodRadius = _neighbourhoodRadius
