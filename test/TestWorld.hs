@@ -8,7 +8,7 @@ import Control.Monad (replicateM)
 import Data.List (sortOn)
 
 import IdCtx (runIdCtx)
-import Particle (Particle, newSpecies, newParticle, particleId, position, setAffinityMap)
+import Particle (Particle, newSpecies, newParticle, particleId, position, updateAffinityMap)
 import Point (Point(..))
 import World (newWorld, stepWorld, addParticle, allParticles, nearbyParticles)
 
@@ -64,8 +64,8 @@ testWorld = describe "World" $ do
             in allParticles nextWorld `shouldBe` []
         it "should do nothing if all of the particles are too far away from each other" $ runIdCtx $ do
             let (smallSpecies', largeSpecies') = runIdCtx $ (,) <$> newSpecies 0.001 0.1 1 <*> newSpecies 0.001 0.5 4
-                smallSpecies = setAffinityMap [(largeSpecies', 100000), (smallSpecies', (-1000000))] smallSpecies'
-                largeSpecies = setAffinityMap [(smallSpecies', 100000), (largeSpecies', (-1000000))] largeSpecies'
+                smallSpecies = foldr updateAffinityMap smallSpecies' [(largeSpecies', 100000), (smallSpecies', (-1000000))]
+                largeSpecies = foldr updateAffinityMap largeSpecies' [(smallSpecies', 100000), (largeSpecies', (-1000000))]
             top <- newParticle largeSpecies (Point 0 10 0)
             bottom <- newParticle largeSpecies (Point 0 (-10) 0)
             left <- newParticle smallSpecies (Point (-10) 0 0)

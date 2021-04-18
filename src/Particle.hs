@@ -12,10 +12,10 @@ module Particle (
     position,
     species,
     neighbourhoodRadius,
-    setAffinityMap
+    updateAffinityMap
 ) where
 
-import Data.IntMap (IntMap, empty, fromList)
+import Data.IntMap (IntMap, empty, insert)
 
 import IdCtx (IdCtx, getNextId)
 import Point (Point(..))
@@ -61,7 +61,7 @@ species = _species
 neighbourhoodRadius :: Species -> Double
 neighbourhoodRadius = _neighbourhoodRadius
 
-setAffinityMap :: [(Species, Double)] -> Species -> Species
-setAffinityMap protoMap thisSpecies =
-    let getSpeciesIdFst (species', affinity) = (_speciesId species', affinity)
-    in thisSpecies {_affinityMap = fromList (fmap getSpeciesIdFst protoMap)}
+updateAffinityMap :: (Species, Double) -> Species -> Species
+updateAffinityMap (otherSpecies, affinity) thisSpecies =
+    let oldMap = _affinityMap thisSpecies
+    in thisSpecies {_affinityMap = insert (_speciesId otherSpecies) affinity oldMap}
