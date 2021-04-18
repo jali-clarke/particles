@@ -20,7 +20,9 @@ maintainer:         jinnah.ali-clarke@outlook.com
 extra-source-files: CHANGELOG.md
 
 library
-    exposed-modules:  MyLib
+    exposed-modules:
+        Particle,
+        World
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -41,8 +43,9 @@ executable particles
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
     build-depends:
-        base ^>=4.14.1.0,
-        particles
+        particles,
+
+        base ^>=4.14.1.0
 
     hs-source-dirs:   app
     default-language: Haskell2010
@@ -56,6 +59,8 @@ test-suite particles-test
     other-modules:
         TestWorld
     build-depends:
+        particles,
+
         base ^>=4.14.1.0,
         hspec == 2.7.10
 
