@@ -9,9 +9,7 @@ module Particle (
     newParticle,
 
     particleId,
-    x,
-    y,
-    z,
+    position,
     species,
     neighbourhoodRadius,
     setAffinityMap
@@ -20,6 +18,7 @@ module Particle (
 import Data.IntMap (IntMap, empty, fromList)
 
 import IdCtx (IdCtx, getNextId)
+import Point (Point(..))
 
 type SpeciesId = Int
 type ParticleId = Int
@@ -35,9 +34,7 @@ data Species = Species {
 data Particle = Particle {
     _particleId :: ParticleId,
     _species :: Species,
-    _x :: Double,
-    _y :: Double,
-    _z :: Double
+    _position :: Point
 } deriving Show
 
 instance Eq Species where
@@ -49,20 +46,14 @@ instance Eq Particle where
 newSpecies :: Double -> Double -> Double -> IdCtx Species
 newSpecies mass radius thisNeighbourhoodRadius = fmap (\nextId -> Species nextId mass radius thisNeighbourhoodRadius empty) getNextId
 
-newParticle :: Species -> Double -> Double -> Double -> IdCtx Particle
-newParticle thisSpecies thisX thisY thisZ = fmap (\nextId -> Particle nextId thisSpecies thisX thisY thisZ) getNextId
+newParticle :: Species -> Point -> IdCtx Particle
+newParticle thisSpecies thisPosition = fmap (\nextId -> Particle nextId thisSpecies thisPosition) getNextId
 
 particleId :: Particle -> ParticleId
 particleId = _particleId
 
-x :: Particle -> Double
-x = _x
-
-y :: Particle -> Double
-y = _y
-
-z :: Particle -> Double
-z = _z
+position :: Particle -> Point
+position = _position
 
 species :: Particle -> Species
 species = _species

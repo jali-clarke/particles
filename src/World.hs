@@ -9,12 +9,13 @@ module World (
     nearbyParticles
 ) where
 
-import Particle (Particle, neighbourhoodRadius, species, x, y, z)
+import Point (Point(..), diff, normSq)
+import Particle (Particle, neighbourhoodRadius, species, position)
 
-data World = World {_xMax :: Double, _yMax :: Double, _zMax :: Double, _allParticles :: [Particle]}
+data World = World {_topRight :: Point, _allParticles :: [Particle]}
 
-newWorld :: Double -> Double -> Double -> World
-newWorld xMax yMax zMax = World xMax yMax zMax []
+newWorld :: Point -> World
+newWorld topRight = World topRight []
 
 stepWorld :: Double -> World -> World -> World
 stepWorld _ _ world = world
@@ -29,9 +30,9 @@ allParticles = _allParticles
 
 nearbyParticles :: Particle -> World -> [Particle]
 nearbyParticles particle world =
-    let particleIsNearby otherParticle =
-            let square = (^ (2 :: Int))
-                squaredDiffCoord coord = square (coord particle - coord otherParticle)
-                squaredDist = squaredDiffCoord x + squaredDiffCoord y + squaredDiffCoord z
-            in squaredDist <= square (neighbourhoodRadius . species $ particle)
+    let particlePosition = position particle
+        particleIsNearby otherParticle =
+            let distanceSquared = normSq $ diff particlePosition (position otherParticle)
+                bounds = neighbourhoodRadius . species $ particle
+            in distanceSquared <= bounds * bounds
     in filter particleIsNearby (_allParticles world)
