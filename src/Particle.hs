@@ -2,6 +2,9 @@ module Particle (
     Species,
     Particle,
 
+    SpeciesId,
+    ParticleId,
+
     newSpecies,
     newParticle,
 
@@ -13,10 +16,28 @@ module Particle (
     neighbourhoodRadius
 ) where
 
+import Data.IntMap (IntMap, empty)
+
 import IdCtx (IdCtx, getNextId)
 
-data Species = Species {_speciesId :: Int, _mass :: Double, _radius :: Double, _neighbourhoodRadius :: Double} deriving Show
-data Particle = Particle {_particleId :: Int, _species :: Species, _x :: Double, _y :: Double, _z :: Double} deriving Show
+type SpeciesId = Int
+type ParticleId = Int
+
+data Species = Species {
+    _speciesId :: SpeciesId,
+    _mass :: Double,
+    _radius :: Double,
+    _neighbourhoodRadius :: Double,
+    _affinityMap :: IntMap Double
+} deriving Show
+
+data Particle = Particle {
+    _particleId :: ParticleId,
+    _species :: Species,
+    _x :: Double,
+    _y :: Double,
+    _z :: Double
+} deriving Show
 
 instance Eq Species where
     species0 == species1 = _speciesId species0 == _speciesId species1
@@ -25,12 +46,12 @@ instance Eq Particle where
     particle0 == particle1 = _particleId particle0 == _particleId particle1
 
 newSpecies :: Double -> Double -> Double -> IdCtx Species
-newSpecies mass radius thisNeighbourhoodRadius = fmap (\nextId -> Species nextId mass radius thisNeighbourhoodRadius) getNextId
+newSpecies mass radius thisNeighbourhoodRadius = fmap (\nextId -> Species nextId mass radius thisNeighbourhoodRadius empty) getNextId
 
 newParticle :: Species -> Double -> Double -> Double -> IdCtx Particle
 newParticle thisSpecies thisX thisY thisZ = fmap (\nextId -> Particle nextId thisSpecies thisX thisY thisZ) getNextId
 
-particleId :: Particle -> Int
+particleId :: Particle -> ParticleId
 particleId = _particleId
 
 x :: Particle -> Double
