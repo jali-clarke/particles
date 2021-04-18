@@ -9,7 +9,7 @@ import Data.List (sortOn)
 
 import IdCtx (runIdCtx)
 import Particle (newSpecies, newParticle, particleId)
-import World (newWorld, addParticle, allParticles, nearbyParticles)
+import World (newWorld, stepWorld, addParticle, allParticles, nearbyParticles)
 
 testWorld :: Spec
 testWorld = describe "World" $ do
@@ -43,7 +43,7 @@ testWorld = describe "World" $ do
             particle1 <- newParticle species 5 6 7
             particle2 <- newParticle species 10 10 10
             let world = foldr addParticle (newWorld 10 10 10) [particle1, particle2]
-            pure $nearbyParticles particle0 world `shouldBe` [particle1]
+            pure $ nearbyParticles particle0 world `shouldBe` [particle1]
         it "should skip multiple particles that are not nearby and keep ones that are" $ runIdCtx $ do
             let species = runIdCtx (newSpecies 0.1 0.1 2)    
             particle0 <- newParticle species 5 5 5
@@ -53,3 +53,8 @@ testWorld = describe "World" $ do
             particle4 <- newParticle species 2.9 5 5
             let world = foldr addParticle (newWorld 10 10 10) [particle1, particle2, particle3, particle4]
             pure $ sortOn particleId (nearbyParticles particle0 world) `shouldBe` [particle1, particle3]
+    describe "stepWorld" $ do
+        it "should do nothing there are no particles" $
+            let world = newWorld 10 10 10
+                nextWorld = stepWorld world
+            in allParticles nextWorld `shouldBe` []

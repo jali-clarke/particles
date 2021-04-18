@@ -2,6 +2,7 @@ module World (
     World,
 
     newWorld,
+    stepWorld,
     addParticle,
 
     allParticles,
@@ -14,6 +15,9 @@ data World = World {_xMax :: Double, _yMax :: Double, _zMax :: Double, _allParti
 
 newWorld :: Double -> Double -> Double -> World
 newWorld xMax yMax zMax = World xMax yMax zMax []
+
+stepWorld :: World -> World
+stepWorld world = world {_allParticles = []}
 
 addParticle :: Particle -> World -> World
 addParticle particle world =
