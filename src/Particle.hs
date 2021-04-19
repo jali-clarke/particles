@@ -7,6 +7,7 @@ module Particle (
 
     newSpecies,
     newParticle,
+    moveParticle,
 
     particleId,
     position,
@@ -48,6 +49,9 @@ newSpecies mass radius thisNeighbourhoodRadius = fmap (\nextId -> Species nextId
 
 newParticle :: Species -> Point -> IdCtx Particle
 newParticle thisSpecies thisPosition = fmap (\nextId -> Particle nextId thisSpecies thisPosition) getNextId
+
+moveParticle :: Point -> Particle -> Particle
+moveParticle _ particle = particle
 
 particleId :: Particle -> ParticleId
 particleId = _particleId
