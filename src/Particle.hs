@@ -19,7 +19,7 @@ module Particle (
 import Data.IntMap (IntMap, empty, insert)
 
 import IdCtx (IdCtx, getNextId)
-import Point (Point(..))
+import Point (Point(..), add)
 
 type SpeciesId = Int
 type ParticleId = Int
@@ -51,7 +51,9 @@ newParticle :: Species -> Point -> IdCtx Particle
 newParticle thisSpecies thisPosition = fmap (\nextId -> Particle nextId thisSpecies thisPosition) getNextId
 
 moveParticle :: Point -> Particle -> Particle
-moveParticle _ particle = particle
+moveParticle displacement particle =
+    let oldPosition = _position particle
+    in particle {_position = add displacement oldPosition}
 
 particleId :: Particle -> ParticleId
 particleId = _particleId

@@ -37,3 +37,7 @@ testParticle = describe "Particle" $ do
             let species = runIdCtx (newSpecies 5 5 5)
                 particle = runIdCtx (newParticle species (Point 5 5 5))
             in position (moveParticle (Point 0 0 0) particle) `shouldBe` position particle
+        it "should move the particle along the specified vector" $
+            let species = runIdCtx (newSpecies 5 5 5)
+                particle = runIdCtx (newParticle species (Point 1 2 3))
+            in position (moveParticle (Point 5 1 (-3)) particle) `shouldBe` Point 6 3 0
