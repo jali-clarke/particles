@@ -13,7 +13,7 @@ module World (
 import Data.IntMap (IntMap, (!), empty, toList, insert)
 
 import Point (Point(..), diff, normSq)
-import Particle (Particle, ParticleId, particleId, neighbourhoodRadius, species, position)
+import Particle (Particle, ParticleId, particleId, moveParticle, neighbourhoodRadius, species, position)
 
 data World = World {_topRight :: Point, _allParticles :: IntMap Particle}
 
@@ -21,7 +21,14 @@ newWorld :: Point -> World
 newWorld topRight = World topRight empty
 
 stepWorld :: Double -> World -> World -> World
-stepWorld _ _ world = world
+stepWorld _ prevWorld world = 
+    let stepParticle particle =
+            let displacement = position particle `diff` position (getParticle (particleId particle) prevWorld)
+            in moveParticle displacement particle
+        
+        nextWorld = world {_allParticles = empty}
+        nextParticles = fmap stepParticle (allParticles world)
+    in foldr addParticle nextWorld nextParticles
 
 addParticle :: Particle -> World -> World
 addParticle particle world =

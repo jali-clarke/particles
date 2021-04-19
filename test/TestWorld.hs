@@ -2,14 +2,14 @@ module TestWorld (
     testWorld
 ) where
 
-import Test.Hspec (Spec, describe, it, xit, shouldBe, shouldSatisfy)
+import Test.Hspec (Spec, describe, it, shouldBe, shouldSatisfy)
 
 import Control.Monad (replicateM)
 import Data.List (sortOn)
 
 import IdCtx (runIdCtx)
 import Particle (Particle, newSpecies, newParticle, moveParticle, particleId, position, updateAffinityMap)
-import Point (Point(..), diff, normSq)
+import Point (Point(..), diff, normSq, scale)
 import World (newWorld, stepWorld, addParticle, allParticles, getParticle, nearbyParticles)
 
 coordinatesEqual :: Particle -> Particle -> Bool
@@ -86,7 +86,7 @@ testWorld = describe "World" $ do
             pure $ do
                 allNextParticles `shouldBe` particles
                 foldr (&&) True (zipWith coordinatesEqual allNextParticles particles) `shouldBe` True
-        xit "should preserve velocity for non-interacting particles" $ runIdCtx $ do
+        it "should preserve velocity for non-interacting particles" $ runIdCtx $ do
             let (smallSpecies, largeSpecies) = runIdCtx $ (,) <$> newSpecies 0.001 0.1 1 <*> newSpecies 0.001 0.2 4
                 leftInitPos = Point 1 0 0
                 topInitPos = Point 1 0 1
@@ -96,9 +96,11 @@ testWorld = describe "World" $ do
             top <- newParticle largeSpecies topInitPos
             let world = newWorld (Point 10 10 10)
                 worldInit = foldr addParticle world [left, top]
-                worldPrev = foldr addParticle world [moveParticle leftDiff left, moveParticle topDiff top]
+                worldPrev = foldr addParticle world [
+                    moveParticle (scale (-1) leftDiff) left,
+                    moveParticle (scale (-1) topDiff) top
+                    ]
                 nextWorld = stepWorld 0.01 worldPrev worldInit
-                allNextParticles = sortOn particleId (allParticles nextWorld)
             pure $ do
-                normSq (position (allNextParticles !! 0) `diff` Point 1.5 0 0) `shouldSatisfy` (< 0.000001)
-                normSq (position (allNextParticles !! 1) `diff` Point 1 (-0.5) 0.5) `shouldSatisfy` (< 0.000001)
+                normSq (position (getParticle (particleId left) nextWorld) `diff` Point 1.5 0 0) `shouldSatisfy` (< 0.000001)
+                normSq (position (getParticle (particleId top) nextWorld) `diff` Point 1 (-0.5) 0.5) `shouldSatisfy` (< 0.000001)
