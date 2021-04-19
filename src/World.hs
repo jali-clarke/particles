@@ -6,11 +6,12 @@ module World (
     addParticle,
 
     allParticles,
+    getParticle,
     nearbyParticles
 ) where
 
 import Point (Point(..), diff, normSq)
-import Particle (Particle, neighbourhoodRadius, species, position)
+import Particle (Particle, ParticleId, particleId, neighbourhoodRadius, species, position)
 
 data World = World {_topRight :: Point, _allParticles :: [Particle]}
 
@@ -27,6 +28,9 @@ addParticle particle world =
 
 allParticles :: World -> [Particle]
 allParticles = _allParticles
+
+getParticle :: ParticleId -> World -> Particle
+getParticle pid world = head (filter ((== pid) . particleId) (_allParticles world))
 
 nearbyParticles :: Particle -> World -> [Particle]
 nearbyParticles particle world =

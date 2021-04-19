@@ -2,15 +2,15 @@ module TestWorld (
     testWorld
 ) where
 
-import Test.Hspec (Spec, describe, it, shouldBe)
+import Test.Hspec (Spec, describe, it, xit, shouldBe, shouldSatisfy)
 
 import Control.Monad (replicateM)
 import Data.List (sortOn)
 
 import IdCtx (runIdCtx)
-import Particle (Particle, newSpecies, newParticle, particleId, position, updateAffinityMap)
-import Point (Point(..))
-import World (newWorld, stepWorld, addParticle, allParticles, nearbyParticles)
+import Particle (Particle, newSpecies, newParticle, moveParticle, particleId, position, updateAffinityMap)
+import Point (Point(..), diff, normSq)
+import World (newWorld, stepWorld, addParticle, allParticles, getParticle, nearbyParticles)
 
 coordinatesEqual :: Particle -> Particle -> Bool
 coordinatesEqual particle0 particle1 = position particle0 == position particle1
@@ -57,6 +57,15 @@ testWorld = describe "World" $ do
             particle4 <- newParticle species (Point 2.9 5 5)
             let world = foldr addParticle (newWorld (Point 10 10 10)) [particle1, particle2, particle3, particle4]
             pure $ sortOn particleId (nearbyParticles particle0 world) `shouldBe` [particle1, particle3]
+    describe "getParticle" $ do
+        it "should return a particle given its id" $ runIdCtx $ do
+            let species = runIdCtx (newSpecies 0.1 0.1 5)
+            particle0 <- newParticle species (Point 5 5 5)
+            particle1 <- newParticle species (Point 5 6 7)
+            let world = foldr addParticle (newWorld (Point 10 10 10)) [particle0, particle1]
+            pure $ do
+                getParticle (particleId particle0) world `shouldBe` particle0
+                getParticle (particleId particle1) world `shouldBe` particle1
     describe "stepWorld" $ do
         it "should do nothing if there are no particles" $
             let world = newWorld (Point 10 10 10)
@@ -77,3 +86,19 @@ testWorld = describe "World" $ do
             pure $ do
                 allNextParticles `shouldBe` particles
                 foldr (&&) True (zipWith coordinatesEqual allNextParticles particles) `shouldBe` True
+        xit "should preserve velocity for non-interacting particles" $ runIdCtx $ do
+            let (smallSpecies, largeSpecies) = runIdCtx $ (,) <$> newSpecies 0.001 0.1 1 <*> newSpecies 0.001 0.2 4
+                leftInitPos = Point 1 0 0
+                topInitPos = Point 1 0 1
+                leftDiff = Point 0.5 0 0
+                topDiff = Point 0 (-0.5) (-0.5)
+            left <- newParticle smallSpecies leftInitPos
+            top <- newParticle largeSpecies topInitPos
+            let world = newWorld (Point 10 10 10)
+                worldInit = foldr addParticle world [left, top]
+                worldPrev = foldr addParticle world [moveParticle leftDiff left, moveParticle topDiff top]
+                nextWorld = stepWorld 0.01 worldPrev worldInit
+                allNextParticles = sortOn particleId (allParticles nextWorld)
+            pure $ do
+                normSq (position (allNextParticles !! 0) `diff` Point 1.5 0 0) `shouldSatisfy` (< 0.000001)
+                normSq (position (allNextParticles !! 1) `diff` Point 1 (-0.5) 0.5) `shouldSatisfy` (< 0.000001)
