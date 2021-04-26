@@ -74,8 +74,8 @@ accelOn (Particle _ species0 point0) (Particle _ species1 point1) =
         mass1 = _mass species1
         dirVec = diff point1 point0
         distSq = normSq dirVec
-        forceCoeff = 8 * radius0 ** 4 / 3
-    in scale (forceCoeff / mass1 * distSq ** (-2)) dirVec
+        forceCoeff = 8 * radius0 ^ (4 :: Int) / 3
+    in scale (forceCoeff / (mass1 * distSq ^ (2 :: Int))) dirVec
 
 updateAffinityMap :: (Species, Double) -> Species -> Species
 updateAffinityMap (otherSpecies, affinity) thisSpecies =

@@ -52,4 +52,4 @@ testParticle =
                 particle0 <- newParticle species (Point 1 1 1) 
                 particle1 <- newParticle species (Point 1 2 3)
                 let expectedAccel = scale (8 * (rad ** 4) / 3 / mass * sqrt 5 ** (-4)) (Point 0 1 2)
-                pure $ pointsWithinRadius 0.00000001 (particle0 `accelOn` particle1) expectedAccel
+                pure $ pointsWithinRadius 0.000000000001 (particle0 `accelOn` particle1) expectedAccel
