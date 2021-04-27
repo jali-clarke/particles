@@ -17,7 +17,7 @@ module Particle (
     updateAffinityMap
 ) where
 
-import Data.IntMap (IntMap, empty, insert)
+import Data.IntMap (IntMap, (!?), empty, insert)
 
 import IdCtx (IdCtx, getNextId)
 import Point (Point(..), add, diff, scale, normSq)
@@ -70,12 +70,16 @@ neighbourhoodRadius = _neighbourhoodRadius
 
 accelOn :: Particle -> Particle -> Point
 accelOn (Particle _ species0 point0) (Particle _ species1 point1) =
-    let radius0 = _radius species0
+    let Species speciesId0 _ radius0 _ affinityMap0 = species0
+        affinity =
+            case affinityMap0 !? speciesId0 of
+                Nothing -> 0
+                Just affinity0 -> affinity0
         mass1 = _mass species1
         dirVec = diff point1 point0
         distSq = normSq dirVec
-        forceCoeff = 8 * radius0 ^ (4 :: Int) / 3
-    in scale (forceCoeff / (mass1 * distSq ^ (2 :: Int))) dirVec
+        repulsionForceCoeff = 8 * radius0 ^ (4 :: Int) / 3
+    in scale ((repulsionForceCoeff / (distSq ^ (2 :: Int)) - affinity / (distSq * sqrt distSq)) / mass1) dirVec
 
 updateAffinityMap :: (Species, Double) -> Species -> Species
 updateAffinityMap (otherSpecies, affinity) thisSpecies =

@@ -5,7 +5,7 @@ module TestParticle (
 import Test.Hspec (Spec, describe, it, shouldBe, shouldNotBe)
 
 import IdCtx (runIdCtx)
-import Particle (newSpecies, newParticle, moveParticle, position, accelOn)
+import Particle (newSpecies, newParticle, moveParticle, position, accelOn, updateAffinityMap)
 import Point (Point(..), diff, scale, normSq)
 
 testParticle :: Spec
@@ -52,4 +52,15 @@ testParticle =
                 particle0 <- newParticle species (Point 1 1 1) 
                 particle1 <- newParticle species (Point 1 2 3)
                 let expectedAccel = scale (8 * (rad ** 4) / 3 / mass * sqrt 5 ** (-4)) (Point 0 1 2)
+                pure $ pointsWithinRadius 0.000000000001 (particle0 `accelOn` particle1) expectedAccel
+            it "should return accel of repulsion along with affinity force when affinity map exists" $ runIdCtx $ do
+                let rad = 3
+                    mass = 5
+                    selfAffinity = 1000
+                    species = runIdCtx (newSpecies mass rad 5)
+                    speciesWithMap = updateAffinityMap (species, selfAffinity) species
+                particle0 <- newParticle speciesWithMap (Point 1 1 1) 
+                particle1 <- newParticle speciesWithMap (Point 1 2 3)
+                let repulsionForceCoeff = 8 * (rad ** 4) / 3
+                    expectedAccel = scale ((repulsionForceCoeff * sqrt 5 ** (-4) - selfAffinity * sqrt 5 ** (-3)) / mass) (Point 0 1 2)
                 pure $ pointsWithinRadius 0.000000000001 (particle0 `accelOn` particle1) expectedAccel
