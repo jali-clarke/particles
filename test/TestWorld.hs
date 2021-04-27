@@ -69,7 +69,7 @@ testWorld = describe "World" $ do
     describe "stepWorld" $ do
         it "should do nothing if there are no particles" $
             let world = newWorld (Point 10 10 10)
-                nextWorld = stepWorld 0.01 world world
+                (_, nextWorld) = stepWorld 0.01 (world, world)
             in allParticles nextWorld `shouldBe` []
         it "should do nothing if all of the particles are too far away from each other" $ runIdCtx $ do
             let (smallSpecies', largeSpecies') = runIdCtx $ (,) <$> newSpecies 0.001 0.1 1 <*> newSpecies 0.001 0.5 4
@@ -81,7 +81,7 @@ testWorld = describe "World" $ do
             right <- newParticle smallSpecies (Point 10 0 0)
             let particles = [top, bottom, left, right]
                 world = foldr addParticle (newWorld (Point 20 20 20)) particles
-                nextWorld = stepWorld 0.01 world world
+                (_, nextWorld) = stepWorld 0.01 (world, world)
                 allNextParticles = sortOn particleId (allParticles nextWorld)
             pure $ do
                 allNextParticles `shouldBe` particles
@@ -100,7 +100,9 @@ testWorld = describe "World" $ do
                     moveParticle (scale (-1) leftDiff) left,
                     moveParticle (scale (-1) topDiff) top
                     ]
-                nextWorld = stepWorld 0.01 worldPrev worldInit
+                (worldOld, nextWorld) = stepWorld 0.01 (worldPrev, worldInit)
+                allOldParticles = sortOn particleId (allParticles worldOld)
             pure $ do
                 normSq (position (getParticle (particleId left) nextWorld) `diff` Point 1.5 0 0) `shouldSatisfy` (< 0.000001)
                 normSq (position (getParticle (particleId top) nextWorld) `diff` Point 1 (-0.5) 0.5) `shouldSatisfy` (< 0.000001)
+                foldr (&&) True (zipWith coordinatesEqual allOldParticles [left, top]) `shouldBe` True
